@@ -7,8 +7,11 @@ PREFIX="$(pwd)/llvm_toolchain"
 
 rm -rf "$BUILD" "$PREFIX"
 
-RUNTIMES_FLAGS=(
+LTO_FLAGS=(
   -flto=full
+)
+
+RUNTIMES_FLAGS=(
   -mcpu=native
   -mbranch-protection=standard
   -fstack-protector-all
@@ -33,8 +36,9 @@ cmake -S "$LLVM_SRC/llvm" -B "$BUILD" -G Ninja \
   -DLLVM_ENABLE_PROJECTS='clang;lld' \
   -DLLVM_ENABLE_RUNTIMES='libc;libcxx;libcxxabi;libunwind' \
   -DLLVM_TARGETS_TO_BUILD=AArch64 \
-  -DRUNTIMES_CMAKE_C_FLAGS="${RUNTIMES_FLAGS[*]}" \
-  -DRUNTIMES_CMAKE_CXX_FLAGS="${RUNTIMES_FLAGS[*]} ${RUNTIMES_CXX_FLAGS[*]}" \
+  -DRUNTIMES_aarch64-unknown-linux-gnu_CMAKE_ASM_FLAGS="${RUNTIMES_FLAGS[*]}" \
+  -DRUNTIMES_aarch64-unknown-linux-gnu_CMAKE_C_FLAGS="${LTO_FLAGS[*]} ${RUNTIMES_FLAGS[*]}" \
+  -DRUNTIMES_aarch64-unknown-linux-gnu_CMAKE_CXX_FLAGS="${LTO_FLAGS[*]} ${RUNTIMES_FLAGS[*]} ${RUNTIMES_CXX_FLAGS[*]}" \
   -DRUNTIMES_LLVM_USE_LINKER=lld \
   -DLIBCXX_ENABLE_SHARED=OFF \
   -DLIBCXX_ENABLE_STATIC=ON \
