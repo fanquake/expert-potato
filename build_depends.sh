@@ -28,6 +28,10 @@ CXXFLAGS=(
   -fassume-nothrow-exception-dtor
   )
 
+LDFLAGS=(
+  -fuse-ld=lld
+)
+
 make -C bitcoin/depends/ \
   NO_IPC=1 \
   NO_QT=1 \
@@ -35,4 +39,5 @@ make -C bitcoin/depends/ \
   NO_WALLET=1 \
   NO_ZMQ=1 \
   CFLAGS="${CFLAGS[*]}" \
-  CXXFLAGS="${CFLAGS[*]} ${CXXFLAGS[*]}"
+  CXXFLAGS="${CFLAGS[*]} ${CXXFLAGS[*]}" \
+  LDFLAGS="${LDFLAGS[*]}"
