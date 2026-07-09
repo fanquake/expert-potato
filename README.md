@@ -15,3 +15,8 @@ Did we get some llvm libc
 ```
 llvm-nm -C build/bin/bitcoind | grep -i __llvm_libc | head
 ```
+
+`-static-pie` currently broken with at least duplicated `qsort`:
+```
+LDFLAGS="-Wl,-z,muldefs -static-pie" ./build_bitcoin.sh
+```
