@@ -39,6 +39,7 @@ set(_opt_record_passes
 )
 list(JOIN _opt_record_passes "|" _opt_record_passes)
 
+#   -Wl,--opt-remarks-with-hotness, needs PGO
 string(JOIN " " CMAKE_EXE_LINKER_FLAGS
   -nostdlib++
   -Wl,--pack-dyn-relocs=relr
@@ -46,7 +47,6 @@ string(JOIN " " CMAKE_EXE_LINKER_FLAGS
   -Wl,-O2
   -Wl,--lto-O3
   -Wl,--lto-whole-program-visibility
-  -Wl,--opt-remarks-with-hotness
   -fsave-optimization-record
   "-foptimization-record-passes='${_opt_record_passes}'"
 )
