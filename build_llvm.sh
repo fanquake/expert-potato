@@ -29,7 +29,7 @@ cmake -S "$LLVM_SRC/llvm" -B "$BUILD" -G Ninja \
   -DCMAKE_RANLIB="$(command -v llvm-ranlib)" \
   -DLLVM_CCACHE_BUILD=ON \
   -DLLVM_ENABLE_LLD=ON \
-  -DLLVM_ENABLE_PROJECTS=clang \
+  -DLLVM_ENABLE_PROJECTS='clang;lld' \
   -DLLVM_ENABLE_RUNTIMES='libc;libcxx;libcxxabi;libunwind' \
   -DLLVM_TARGETS_TO_BUILD=AArch64 \
   -DRUNTIMES_CMAKE_C_FLAGS="${RUNTIMES_FLAGS[*]}" \
