@@ -1,19 +1,17 @@
-# Usage:
-#   cmake -G Ninja -B build --toolchain /root/llvm_toolchain.cmake ...
+set(LLVM_TOOLCHAIN_PREFIX "${CMAKE_CURRENT_LIST_DIR}/llvm_toolchain" CACHE PATH)
 
-# build_llvm.sh installs into llvm_toolchain/ next to itself;
-set(LLVM_TOOLCHAIN_PREFIX "${CMAKE_CURRENT_LIST_DIR}/llvm_toolchain" CACHE PATH "Install prefix produced by build_llvm.sh")
-
-set(DEPENDS_TOOLCHAIN_FILE "/root/bitcoin/depends/aarch64-unknown-linux-gnu/toolchain.cmake"
-  CACHE FILEPATH "Bitcoin Core depends toolchain to layer on top of")
+set(DEPENDS_TOOLCHAIN_FILE "${CMAKE_CURRENT_LIST_DIR}/bitcoin/depends/aarch64-unknown-linux-gnu/toolchain.cmake" CACHE FILEPATH)
 
 include("${DEPENDS_TOOLCHAIN_FILE}")
 
 # Compile and link with the just-built toolchain.
-set(CMAKE_C_COMPILER   "${LLVM_TOOLCHAIN_PREFIX}/bin/clang")
+set(CMAKE_C_COMPILER   "${LLVM_TOOLCHAIN_PREFIXR}/bin/clang")
 set(CMAKE_CXX_COMPILER "${LLVM_TOOLCHAIN_PREFIX}/bin/clang++")
 set(CMAKE_AR           "${LLVM_TOOLCHAIN_PREFIX}/bin/llvm-ar")
 set(CMAKE_RANLIB       "${LLVM_TOOLCHAIN_PREFIX}/bin/llvm-ranlib")
+set(CMAKE_STRIP        "${LLVM_TOOLCHAIN_PREFIX}/bin/llvm-strip")
+set(CMAKE_OBJCOPY      "${LLVM_TOOLCHAIN_PREFIX}/bin/llvm-objcopy")
+set(CMAKE_OBJDUMP      "${LLVM_TOOLCHAIN_PREFIX}/bin/llvm-objdump")
 set(CMAKE_LINKER_TYPE LLD)
 
 # Locate the installed runtime archives. With LLVM_ENABLE_RUNTIMES they land
