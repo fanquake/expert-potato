@@ -2,8 +2,10 @@
 set -euo pipefail
 
 LLVM_SRC=../llvm-project
-BUILD=llvm_build
-PREFIX="$(pwd)/llvm_toolchain"
+BUILD="llvm_build"
+PREFIX="llvm_toolchain"
+
+rm -rf "$BUILD" "$PREFIX"
 
 RUNTIMES_FLAGS=(
   -flto=full
