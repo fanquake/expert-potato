@@ -49,7 +49,7 @@ cmake -S "$LLVM_SRC/runtimes" -B "$RUNTIMES_BUILD" -G Ninja \
   -DCMAKE_CXX_FLAGS="${LTO_FLAGS[*]} ${RUNTIMES_FLAGS[*]} ${RUNTIMES_CXX_FLAGS[*]}" \
   -DCMAKE_AR="$PREFIX/bin/llvm-ar" \
   -DCMAKE_RANLIB="$PREFIX/bin/llvm-ranlib" \
-  -DLLVM_USE_LINKER=lld \
+  -DCMAKE_LINKER_TYPE=LLD \
   -DLLVM_ENABLE_RUNTIMES='libc;libcxx;libcxxabi;libunwind' \
   -DLIBCXX_ENABLE_SHARED=OFF \
   -DLIBCXX_ENABLE_STATIC=ON \
