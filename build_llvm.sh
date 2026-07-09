@@ -49,5 +49,6 @@ cmake -S "$LLVM_SRC/llvm" -B "$BUILD" -G Ninja \
   -DLIBCXX_HARDENING_MODE=none \
   -DLIBCXX_USE_COMPILER_RT=OFF
 
-cmake --build "$BUILD"
-cmake --install "$BUILD"
+cmake --build "$BUILD" --target install
+
+rm -rf "$BUILD"
