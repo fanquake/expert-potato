@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
-cd "$(dirname "$0")"
 
-LLVM_SRC=$(pwd)/llvm-project
+LLVM_SRC=../llvm-project
 BUILD=llvm_build
 PREFIX="$(pwd)/llvm_toolchain"
 
