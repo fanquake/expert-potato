@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+rm -rf build
+
 PROFDATA="$(pwd)/bitcoind.profdata"
 
 cmake -S bitcoin -B build -G Ninja \
@@ -9,4 +11,4 @@ cmake -S bitcoin -B build -G Ninja \
   -DREDUCE_EXPORTS=ON \
   -DAPPEND_LDFLAGS="-static-pie"
 
-cmake --build build
+cmake --build build --target bitcoind
