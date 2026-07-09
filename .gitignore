@@ -1,3 +1,4 @@
 bitcoin/
+build/
 llvm_build/
 llvm_toolchain/
