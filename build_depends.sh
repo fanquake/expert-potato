@@ -16,6 +16,7 @@ export STRIP="$TOOLCHAIN/bin/llvm-strip"
 # build_CXX=llvm_toolchain/bin/clang++
 
 CFLAGS=(
+  -O2
   -flto=full
   -mcpu=native
 )
@@ -27,12 +28,6 @@ CXXFLAGS=(
   -fassume-nothrow-exception-dtor
   )
 
-LDFLAGS=(
-  -fuse-ld=lld
-  -fwhole-program-vtables
-  -fstrict-vtable-pointers
-)
-
 make -C bitcoin/depends/ \
   NO_IPC=1 \
   NO_QT=1 \
@@ -40,5 +35,4 @@ make -C bitcoin/depends/ \
   NO_WALLET=1 \
   NO_ZMQ=1 \
   CFLAGS="${CFLAGS[*]}" \
-  CXXFLAGS="${CFLAGS[*]} ${CXXFLAGS[*]}" \
-  LDFLAGS="${LDFLAGS[*]}"
+  CXXFLAGS="${CFLAGS[*]} ${CXXFLAGS[*]}"

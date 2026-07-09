@@ -24,7 +24,7 @@ get_filename_component(LLVM_RUNTIME_LIBDIR "${_llvm_libcxx}" DIRECTORY)
 
 # Compile against the toolchain's libc++ headers; the C++ runtime itself is
 # linked explicitly (and statically) below, hence -nostdlib++ at link time.
-string(APPEND CMAKE_CXX_FLAGS " -stdlib=libc++")
+string(APPEND CMAKE_CXX_FLAGS_INIT " -stdlib=libc++")
 
 # The single quotes around the pass list survive into the ninja rule
 set(_opt_record_passes
@@ -41,12 +41,16 @@ list(JOIN _opt_record_passes "|" _opt_record_passes)
 
 #   -Wl,--opt-remarks-with-hotness, needs PGO
 string(JOIN " " CMAKE_EXE_LINKER_FLAGS
+  -flto=full
+  -fwhole-program-vtables
+  -fstrict-vtable-pointers
   -nostdlib++
   -Wl,--pack-dyn-relocs=relr
   -Wl,--icf=safe
   -Wl,-O2
   -Wl,--lto-O3
   -Wl,--lto-whole-program-visibility
+  -Wl,--save-temps
   -fsave-optimization-record
   "-foptimization-record-passes='${_opt_record_passes}'"
 )
@@ -62,5 +66,4 @@ string(JOIN " " CMAKE_CXX_STANDARD_LIBRARIES
   "${LLVM_RUNTIME_LIBDIR}/libc++abi.a"
   "${LLVM_RUNTIME_LIBDIR}/libunwind.a"
   -Wl,--end-group
-  -Wl,--save-temps
 )
