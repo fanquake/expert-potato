@@ -3,7 +3,7 @@ set -euo pipefail
 
 LLVM_SRC=../llvm-project
 BUILD="llvm_build"
-PREFIX="llvm_toolchain"
+PREFIX="$(pwd)/llvm_toolchain"
 
 rm -rf "$BUILD" "$PREFIX"
 

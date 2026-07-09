@@ -1,11 +1,11 @@
-set(LLVM_TOOLCHAIN_PREFIX "${CMAKE_CURRENT_LIST_DIR}/llvm_toolchain" CACHE PATH)
+set(LLVM_TOOLCHAIN_PREFIX "${CMAKE_CURRENT_LIST_DIR}/llvm_toolchain" CACHE PATH "")
 
-set(DEPENDS_TOOLCHAIN_FILE "${CMAKE_CURRENT_LIST_DIR}/bitcoin/depends/aarch64-unknown-linux-gnu/toolchain.cmake" CACHE FILEPATH)
+set(DEPENDS_TOOLCHAIN_FILE "${CMAKE_CURRENT_LIST_DIR}/bitcoin/depends/aarch64-unknown-linux-gnu/toolchain.cmake" CACHE FILEPATH "")
 
 include("${DEPENDS_TOOLCHAIN_FILE}")
 
 # Compile and link with the just-built toolchain.
-set(CMAKE_C_COMPILER   "${LLVM_TOOLCHAIN_PREFIXR}/bin/clang")
+set(CMAKE_C_COMPILER   "${LLVM_TOOLCHAIN_PREFIX}/bin/clang")
 set(CMAKE_CXX_COMPILER "${LLVM_TOOLCHAIN_PREFIX}/bin/clang++")
 set(CMAKE_AR           "${LLVM_TOOLCHAIN_PREFIX}/bin/llvm-ar")
 set(CMAKE_RANLIB       "${LLVM_TOOLCHAIN_PREFIX}/bin/llvm-ranlib")

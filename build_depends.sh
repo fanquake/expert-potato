@@ -1,14 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-export CC=llvm_toolchain/bin/clang
-export CXX=llvm_toolchain/bin/clang++
-export AR=llvm_toolchain/llvm-ar
-export NM=llvm_toolchain/bin/llvm-nm
-export OBJCOPY=llvm_toolchain/bin/llvm-objcopy
-export OBJDUMP=llvm_toolchain/bin/llvm-objdump
-export RANLIB=llvm_toolchain/bin/llvm-ranlib
-export STRIP=llvm_toolchain/bin/llvm-nm
+TOOLCHAIN="$(pwd)/llvm_toolchain"
+
+export CC="$TOOLCHAIN/bin/clang"
+export CXX="$TOOLCHAIN/bin/clang++"
+export AR="$TOOLCHAIN/bin/llvm-ar"
+export NM="$TOOLCHAIN/bin/llvm-nm"
+export OBJCOPY="$TOOLCHAIN/bin/llvm-objcopy"
+export OBJDUMP="$TOOLCHAIN/bin/llvm-objdump"
+export RANLIB="$TOOLCHAIN/bin/llvm-ranlib"
+export STRIP="$TOOLCHAIN/bin/llvm-strip"
 
 # build_CC=llvm_toolchain/bin/clang
 # build_CXX=llvm_toolchain/bin/clang++

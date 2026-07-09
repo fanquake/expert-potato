@@ -7,7 +7,7 @@
       "description": "Consumes the toolchain built by build_llvm.sh via llvm_toolchain.cmake",
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build",
-      "toolchainFile": "/root/llvm_toolchain.cmake",
+      "toolchainFile": "${sourceDir}/../llvm_toolchain.cmake",
       "cacheVariables": {
         "ENABLE_EXTERNAL_SIGNER": "OFF",
         "REDUCE_EXPORTS": "ON",
