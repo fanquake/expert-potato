@@ -9,6 +9,6 @@ cmake -S bitcoin -B build -G Ninja \
   --toolchain "$(pwd)/llvm_toolchain.cmake" \
   -DENABLE_EXTERNAL_SIGNER=OFF \
   -DREDUCE_EXPORTS=ON \
-  -DAPPEND_LDFLAGS="-static-pie"
+  -DAPPEND_LDFLAGS="${LDFLAGS:-}"
 
 cmake --build build --target bitcoind
