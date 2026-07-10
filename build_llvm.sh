@@ -64,6 +64,7 @@ cmake -S "$LLVM_SRC/runtimes" -B "$RUNTIMES_BUILD" -G Ninja \
   -DCMAKE_AR="$PREFIX/bin/llvm-ar" \
   -DCMAKE_RANLIB="$PREFIX/bin/llvm-ranlib" \
   -DCMAKE_LINKER_TYPE=LLD \
+  -DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR=ON \
   -DLLVM_ENABLE_RUNTIMES='libc;libcxx;libcxxabi;libunwind;compiler-rt' \
   -DLIBCXX_ENABLE_SHARED=OFF \
   -DLIBCXX_ENABLE_STATIC=ON \
