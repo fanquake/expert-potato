@@ -13,5 +13,5 @@ cat build/whyextract.txt
 
 Did we get some llvm libc
 ```bash
-llvm-nm -C build/bin/bitcoind | grep -i __llvm_libc | head
+llvm_toolchain/bin/llvm-nm -C build/bin/bitcoind | grep -i __llvm_libc | head
 ```
