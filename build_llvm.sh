@@ -8,6 +8,15 @@ PREFIX="$(pwd)/llvm_toolchain"
 
 rm -rf "$BUILD" "$RUNTIMES_BUILD" "$PREFIX"
 
+# Drop qsort/qsort_r from llvm-libc: in overlay mode with -static-pie
+# we collide with glibc.
+cat > "$LLVM_SRC/libc/config/linux/aarch64/exclude.txt" <<'EOF'
+list(APPEND TARGET_LLVMLIBC_REMOVED_ENTRYPOINTS
+  libc.src.stdlib.qsort
+  libc.src.stdlib.qsort_r
+)
+EOF
+
 LTO_FLAGS=(
   -flto=full
 )
