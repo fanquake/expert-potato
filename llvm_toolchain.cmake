@@ -40,7 +40,6 @@ set(_opt_record_passes
 list(JOIN _opt_record_passes "|" _opt_record_passes)
 
 # -Wl,--opt-remarks-with-hotness, needs PGO
-# -Wl,--pack-dyn-relocs=relr, put back with -static-pie
 string(JOIN " " CMAKE_EXE_LINKER_FLAGS
   -flto=full
   -fwhole-program-vtables
@@ -50,6 +49,7 @@ string(JOIN " " CMAKE_EXE_LINKER_FLAGS
   -Wl,-O2
   -Wl,--lto-O3
   -Wl,--lto-whole-program-visibility
+  -Wl,--pack-dyn-relocs=relr
   -Wl,--save-temps
   -fsave-optimization-record
   "-foptimization-record-passes='${_opt_record_passes}'"
