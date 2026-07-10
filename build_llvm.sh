@@ -48,9 +48,14 @@ cmake -S "$LLVM_SRC/llvm" -B "$BUILD" -G Ninja \
 
 cmake --build "$BUILD" --target install
 
+TRIPLE=aarch64-unknown-linux-gnu
+
 cmake -S "$LLVM_SRC/runtimes" -B "$RUNTIMES_BUILD" -G Ninja \
   -DCMAKE_C_COMPILER="$PREFIX/bin/clang" \
   -DCMAKE_CXX_COMPILER="$PREFIX/bin/clang++" \
+  -DCMAKE_C_COMPILER_TARGET="$TRIPLE" \
+  -DCMAKE_CXX_COMPILER_TARGET="$TRIPLE" \
+  -DCMAKE_ASM_COMPILER_TARGET="$TRIPLE" \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_INSTALL_PREFIX="$PREFIX" \
   -DCMAKE_ASM_FLAGS="${RUNTIMES_FLAGS[*]}" \
