@@ -45,6 +45,7 @@ string(JOIN " " CMAKE_EXE_LINKER_FLAGS
   -fwhole-program-vtables
   -fstrict-vtable-pointers
   -nostdlib++
+  --rtlib=compiler-rt
   -Wl,--icf=safe
   -Wl,-O2
   -Wl,--lto-O3
