@@ -85,7 +85,7 @@ cmake -S "$LLVM_SRC/runtimes" -B "$RUNTIMES_BUILD" -G Ninja \
   -DCOMPILER_RT_BUILD_CRT=OFF \
   -DCOMPILER_RT_BUILD_SANITIZERS=OFF \
   -DCOMPILER_RT_BUILD_XRAY=OFF \
-  -DCOMPILER_RT_BUILD_PROFILE=OFF \
+  -DCOMPILER_RT_BUILD_PROFILE=ON \
   -DCOMPILER_RT_BUILD_MEMPROF=OFF \
   -DCOMPILER_RT_BUILD_ORC=OFF \
   -DCOMPILER_RT_BUILD_GWP_ASAN=OFF \
@@ -93,14 +93,16 @@ cmake -S "$LLVM_SRC/runtimes" -B "$RUNTIMES_BUILD" -G Ninja \
 
 cmake --build "$RUNTIMES_BUILD" --target install
 
-# With LLVM_ENABLE_PER_TARGET_RUNTIME_DIR, compiler-rt installs builtins
-# alongside libc++ in lib/<triple>/, but the driver's own default/--rtlib=
-# resolution still only looks under the versioned clang resource dir
-# (lib/clang/<ver>/lib/<triple>/). Symlink it into place there so every
-# caller of this clang (not just consumers of llvm_toolchain.cmake) finds it.
+# With LLVM_ENABLE_PER_TARGET_RUNTIME_DIR, compiler-rt installs its archives
+# alongside libc++ in lib/<triple>/, but the driver's own default/--rtlib=/
+# -fprofile-generate resolution still only looks under the versioned clang
+# resource dir (lib/clang/<ver>/lib/<triple>/). Symlink each one into place
+# there so every caller of this clang (not just consumers of
+# llvm_toolchain.cmake) finds it.
 RESOURCE_DIR="$("$PREFIX/bin/clang++" -print-resource-dir)"
 mkdir -p "$RESOURCE_DIR/lib/$TRIPLE"
-ln -sf "$PREFIX/lib/$TRIPLE/libclang_rt.builtins.a" \
-  "$RESOURCE_DIR/lib/$TRIPLE/libclang_rt.builtins.a"
+for lib in "$PREFIX/lib/$TRIPLE"/libclang_rt.*.a; do
+  ln -sf "$lib" "$RESOURCE_DIR/lib/$TRIPLE/$(basename "$lib")"
+done
 
 rm -rf "$BUILD" "$RUNTIMES_BUILD"
