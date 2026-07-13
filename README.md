@@ -30,3 +30,12 @@ grep -oE '"target-(cpu|features)"="[^"]*"' bc.ll | sort | uniq -c
 unwind_phase2
 unwind_phase2_forced
 ```
+
+Opt report generation:
+```bash
+/root/optview2/opt-viewer.py --jobs=10 \
+      --collect-opt-success \
+      --output-dir=/root/opt_report \
+      --source-dir=/root/expert-potato/bitcoin \
+      /root/expert-potato/build/bin/bitcoind-opt.ld.yaml
+```
