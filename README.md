@@ -48,3 +48,19 @@ Opt report generation:
       --source-dir=/root/expert-potato/bitcoin \
       /root/expert-potato/build/bin/bitcoind-opt.ld.yaml
 ```
+
+## Future
+
+- The leftover `__aarch64_cas4_acq`-style outline-atomics symbols (should) go-away when we switch to
+  a full LLVM libc build.
+
+
+## TODO
+
+- Check PGO training coverage: `llvm_toolchain/bin/llvm-profdata show --all-functions
+    --counts bitcoind.profdata | grep 'Counts: 0'` for hot-in-prod functions with no samples.
+- Read through `-fsave-optimization-record` remarks (opt-viewer / llvm-opt-report),
+    cross-referenced against `perf report` hot functions, for missed inlining/vectorization.
+- Try an instrumented BOLT profile (`llvm-bolt -instrument`) vs the perf-derived one and
+    compare `-dyno-stats` output.
+- Measure `--icf=safe` vs `--icf=all` size delta (`--print-icf-sections`)
