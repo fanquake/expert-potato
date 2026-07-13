@@ -45,7 +45,6 @@ string(JOIN " " CMAKE_EXE_LINKER_FLAGS
   -fwhole-program-vtables
   -fstrict-vtable-pointers
   -nostdlib++
-  --rtlib=compiler-rt
   -Wl,--icf=safe
   -Wl,-O2
   -Wl,--lto-O3
@@ -58,13 +57,22 @@ string(JOIN " " CMAKE_EXE_LINKER_FLAGS
 
 # LLVM libc in overlay mode: link libllvmlibc.a ahead of the system libc
 # https://libc.llvm.org/overlay_mode.html
-set(CMAKE_C_STANDARD_LIBRARIES "-L${LLVM_RUNTIME_LIBDIR} -lllvmlibc")
+# libclang_rt.builtins.a is linked explicitly rather than via --rtlib=compiler-rt.
+string(JOIN " " CMAKE_C_STANDARD_LIBRARIES
+  -L${LLVM_RUNTIME_LIBDIR}
+  -Wl,--start-group
+  -lllvmlibc
+  "${LLVM_RUNTIME_LIBDIR}/libclang_rt.builtins.a"
+  -Wl,--end-group
+)
 
 string(JOIN " " CMAKE_CXX_STANDARD_LIBRARIES
-  ${CMAKE_C_STANDARD_LIBRARIES}
+  -L${LLVM_RUNTIME_LIBDIR}
   -Wl,--start-group
+  -lllvmlibc
   "${LLVM_RUNTIME_LIBDIR}/libc++.a"
   "${LLVM_RUNTIME_LIBDIR}/libc++abi.a"
   "${LLVM_RUNTIME_LIBDIR}/libunwind.a"
+  "${LLVM_RUNTIME_LIBDIR}/libclang_rt.builtins.a"
   -Wl,--end-group
 )

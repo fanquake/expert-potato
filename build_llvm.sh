@@ -93,4 +93,14 @@ cmake -S "$LLVM_SRC/runtimes" -B "$RUNTIMES_BUILD" -G Ninja \
 
 cmake --build "$RUNTIMES_BUILD" --target install
 
+# With LLVM_ENABLE_PER_TARGET_RUNTIME_DIR, compiler-rt installs builtins
+# alongside libc++ in lib/<triple>/, but the driver's own default/--rtlib=
+# resolution still only looks under the versioned clang resource dir
+# (lib/clang/<ver>/lib/<triple>/). Symlink it into place there so every
+# caller of this clang (not just consumers of llvm_toolchain.cmake) finds it.
+RESOURCE_DIR="$("$PREFIX/bin/clang++" -print-resource-dir)"
+mkdir -p "$RESOURCE_DIR/lib/$TRIPLE"
+ln -sf "$PREFIX/lib/$TRIPLE/libclang_rt.builtins.a" \
+  "$RESOURCE_DIR/lib/$TRIPLE/libclang_rt.builtins.a"
+
 rm -rf "$BUILD" "$RUNTIMES_BUILD"
