@@ -31,6 +31,15 @@ unwind_phase2
 unwind_phase2_forced
 ```
 
+Look for (potentially) duplicated symbols/code.
+This mostly flags duplicated code out of glibc.
+```bash
+llvm_toolchain/bin/llvm-nm -C --defined-only build/bin/bitcoind | awk '$2 ~ /^[rdbs]$/' | sort -u | cut -d' ' -f3- | sort | uniq -cd | sort -rn
+  2 step4_jumps.3
+  2 step4_jumps.0
+  2 step3b_jumps.2
+```
+
 Opt report generation:
 ```bash
 /root/optview2/opt-viewer.py --jobs=10 \
