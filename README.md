@@ -49,11 +49,10 @@ Opt report generation:
       /root/expert-potato/build/bin/bitcoind-opt.ld.yaml
 ```
 
-## Future
+## llvm-project submodule
 
-- The leftover `__aarch64_cas4_acq`-style outline-atomics symbols (should) go-away when we switch to
-  a full LLVM libc build.
-
+Currently tracking `main`, for `-static-pie`. Will move to `release/23.x`.
+Update tracked branch with: `git submodule update --remote --depth 1`.
 
 ## TODO
 
@@ -64,3 +63,8 @@ Opt report generation:
 - Try an instrumented BOLT profile (`llvm-bolt -instrument`) vs the perf-derived one and
     compare `-dyno-stats` output.
 - Measure `--icf=safe` vs `--icf=all` size delta (`--print-icf-sections`)
+
+## Future
+
+- The leftover `__aarch64_cas4_acq`-style outline-atomics symbols (should) go-away when we switch to
+  a full LLVM libc build.

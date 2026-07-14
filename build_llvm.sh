@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-LLVM_SRC=../llvm-project
+LLVM_SRC=llvm-project
 BUILD="llvm_build"
 RUNTIMES_BUILD="runtimes_build"
 PREFIX="$(pwd)/llvm_toolchain"
