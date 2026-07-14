@@ -51,7 +51,7 @@ Opt report generation:
 
 ## llvm-project submodule
 
-Currently tracking `main`, for `-static-pie`. Will move to `release/23.x`.
+Currently tracking `release/23.x` (minimum for -static-pie in bolt).
 Update tracked branch with: `git submodule update --remote --depth 1`.
 
 ## TODO
