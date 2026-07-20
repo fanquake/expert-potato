@@ -3,7 +3,7 @@ set -euo pipefail
 
 BITCOIND="build/bin/bitcoind"
 BOLT="$(pwd)/llvm_toolchain/bin/llvm-bolt"
-DATA="${1:-$(pwd)/bolt_data/prof.fdata}"
+DATA="${1:-$(pwd)/raw_bolt/prof.fdata}"
 
 BOLT_ARGS=(
   -dyno-stats

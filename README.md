@@ -4,6 +4,8 @@
 ./build_bitcoin.sh
 ```
 
+## Binary contents
+
 What is in bitcoind, and why:
 ```bash
 LDFLAGS="-Wl,-Map=bitcoind.map -Wl,--why-extract=whyextract.txt" ./build_bitcoin.sh
@@ -11,10 +13,59 @@ LDFLAGS="-Wl,-Map=bitcoind.map -Wl,--why-extract=whyextract.txt" ./build_bitcoin
 cat build/whyextract.txt
 ```
 
+Look for (potentially) duplicated symbols/code.
+This mostly flags duplicated code out of glibc.
+```bash
+llvm_toolchain/bin/llvm-nm -C --defined-only build/bin/bitcoind | awk '$2 ~ /^[rdbs]$/' | sort -u | cut -d' ' -f3- | sort | uniq -cd | sort -rn
+  2 step4_jumps.3
+  2 step4_jumps.0
+  2 step3b_jumps.2
+```
+
+## PGO Collection
+```bash
+export PGO_FLAGS="-fprofile-generate=raw_pgo/ -fprofile-update=atomic"
+CFLAGS="${PGO_FLAGS}" CXXFLAGS="${PGO_FLAGS}" LDFLAGS="${PGO_FLAGS}" ./build_bitcoin.sh
+
+rm -rf /mnt/HC_Volume_104453609/btc_datadir/ && mkdir /mnt/HC_Volume_104453609/btc_datadir/
+
+time ./build/bin/bitcoind -datadir=/mnt/HC_Volume_104453609/btc_datadir -dbcache=6144 -prune=2000 -stopatheight=950000 -daemon
+
+llvm_toolchain/bin/llvm-profdata merge -o bitcoind.profdata raw_pgo/*.profraw
+```
+
+## BOLT instrumentation
+```bash
+export PGO_FLAGS="-fprofile-use=$(pwd)/bitcoind.profdata"
+CFLAGS="${PGO_FLAGS}" CXXFLAGS="${PGO_FLAGS}" LDFLAGS="-Wl,--emit-relocs ${PGO_FLAGS}" ./build_bitcoin.sh
+llvm_toolchain/bin/llvm-readelf -S build/bin/bitcoind | grep .rela.text # check relocs
+
+llvm_toolchain/bin/llvm-bolt ./build/bin/bitcoind \
+                             -instrument \
+                             --instrumentation-sleep-time=1 \
+                             --instrumentation-file=raw_bolt/prof.fdata \
+                             -o bitcoind.instrumented
+
+time ./bitcoind.instrumented -datadir=/mnt/HC_Volume_104453609/btc_datadir -dbcache=6144 -prune=2000 -stopatheight=950000 -daemon
+
+# TODO: merge raw data from /tmp/prof.data into raw_bolt/
+
+./apply_bolt.sh
+```
+
+Investigate
+```
+BOLT-INFO: PointerAuthCFIAnalyzer ran on 10161 functions. Ignored 192 functions (1.89%) because of CFI inconsistencies
+```
+
+## LLVM libc
+
 Did we get some llvm libc
 ```bash
 llvm_toolchain/bin/llvm-nm -C build/bin/bitcoind | grep -i __llvm_libc | head
 ```
+
+## Uniform compilation flags
 
 Check that all code is getting the same flags.
 ```bash
@@ -31,14 +82,7 @@ unwind_phase2
 unwind_phase2_forced
 ```
 
-Look for (potentially) duplicated symbols/code.
-This mostly flags duplicated code out of glibc.
-```bash
-llvm_toolchain/bin/llvm-nm -C --defined-only build/bin/bitcoind | awk '$2 ~ /^[rdbs]$/' | sort -u | cut -d' ' -f3- | sort | uniq -cd | sort -rn
-  2 step4_jumps.3
-  2 step4_jumps.0
-  2 step3b_jumps.2
-```
+## Optimisation Report
 
 Opt report generation:
 ```bash
@@ -56,6 +100,7 @@ Update tracked branch with: `git submodule update --remote --depth 1`.
 
 ## TODO
 
+- Add a "bloaty" analyse script
 - Check PGO training coverage: `llvm_toolchain/bin/llvm-profdata show --all-functions
     --counts bitcoind.profdata | grep 'Counts: 0'` for hot-in-prod functions with no samples.
 - Read through `-fsave-optimization-record` remarks (opt-viewer / llvm-opt-report),
