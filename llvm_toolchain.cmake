@@ -58,10 +58,13 @@ string(JOIN " " CMAKE_EXE_LINKER_FLAGS
 # LLVM libc in overlay mode: link libllvmlibc.a ahead of the system libc
 # https://libc.llvm.org/overlay_mode.html
 # libclang_rt.builtins.a is linked explicitly rather than via --rtlib=compiler-rt.
+# Scudo is linked ahead of glibc the same way, so its malloc/free/etc. win over
+# glibc's (overlay mode: unresolved refs it doesn't provide still fall through).
 string(JOIN " " CMAKE_C_STANDARD_LIBRARIES
   -L${LLVM_RUNTIME_LIBDIR}
   -Wl,--start-group
   -lllvmlibc
+  "${LLVM_RUNTIME_LIBDIR}/libclang_rt.scudo_standalone.a"
   "${LLVM_RUNTIME_LIBDIR}/libclang_rt.builtins.a"
   -Wl,--end-group
 )
@@ -73,6 +76,8 @@ string(JOIN " " CMAKE_CXX_STANDARD_LIBRARIES
   "${LLVM_RUNTIME_LIBDIR}/libc++.a"
   "${LLVM_RUNTIME_LIBDIR}/libc++abi.a"
   "${LLVM_RUNTIME_LIBDIR}/libunwind.a"
+  "${LLVM_RUNTIME_LIBDIR}/libclang_rt.scudo_standalone.a"
+  "${LLVM_RUNTIME_LIBDIR}/libclang_rt.scudo_standalone_cxx.a"
   "${LLVM_RUNTIME_LIBDIR}/libclang_rt.builtins.a"
   -Wl,--end-group
 )
