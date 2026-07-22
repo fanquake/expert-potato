@@ -99,7 +99,7 @@ CFLAGS="${PGO_FLAGS}" CXXFLAGS="${PGO_FLAGS}" LDFLAGS="${PGO_FLAGS}" ./build_bit
 
 rm -rf /mnt/HC_Volume_104453609/btc_datadir/ && mkdir /mnt/HC_Volume_104453609/btc_datadir/
 
-time ./build/bin/bitcoind -datadir=/mnt/HC_Volume_104453609/btc_datadir -stopatheight=950000 -daemon
+time ./build/bin/bitcoind -datadir=/mnt/HC_Volume_104453609/btc_datadir -conf=$(pwd)/bench.conf
 
 llvm_toolchain/bin/llvm-profdata merge -o bitcoind.profdata raw_pgo/*.profraw
 ```
@@ -117,7 +117,7 @@ llvm_toolchain/bin/llvm-bolt ./build/bin/bitcoind \
                              --instrumentation-file=raw_bolt/prof.fdata \
                              -o bitcoind.instrumented
 
-time ./bitcoind.instrumented -datadir=/mnt/HC_Volume_104453609/btc_datadir -stopatheight=950000 -daemon
+time ./bitcoind.instrumented -datadir=/mnt/HC_Volume_104453609/btc_datadir -conf=$(pwd)/bench.conf
 
 # TODO: merge raw data from /tmp/prof.data into raw_bolt/
 ```
@@ -131,7 +131,7 @@ BOLT-INFO: PointerAuthCFIAnalyzer ran on 10161 functions. Ignored 192 functions 
 ```bash
 ./apply_bolt.sh
 
-time ./bitcoind.bolt -datadir=/mnt/HC_Volume_104453609/btc_datadir -stopatheight=950000 -daemon
+time ./bitcoind.bolt -datadir=/mnt/HC_Volume_104453609/btc_datadir -conf=$(pwd)/bench.conf
 ```
 
 ## Optimisation Report
