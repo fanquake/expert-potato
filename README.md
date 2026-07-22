@@ -1,5 +1,31 @@
 # Core x LLVM
 
+Working towards a self-contained build of Bitcoin Core with LLVM.
+* Build using a self-compiled `23.x` Clang and `lld`.
+* Use LLVM [`libc++`](https://libcxx.llvm.org/)
+* Use LLVM [`libc` in overlay mode](https://libc.llvm.org/overlay_mode.html)
+* Use [`scudo`](https://llvm.org/docs/ScudoHardenedAllocator.html) as an allocator
+* Use [Profile Guided Optimization](https://clang.llvm.org/docs/UsersManual.html#profile-guided-optimization)
+* Use [LLVM BOLT](https://github.com/llvm/llvm-project/blob/main/bolt/README.md)
+
+### TODO
+
+- Drop depends build if `boost::multi_index` is swapped for [`tmi2`](https://github.com/theuni/tmi2)
+- Add a [`bloaty`](https://github.com/google/bloaty) analyse script
+- Check PGO training coverage: `llvm_toolchain/bin/llvm-profdata show --all-functions
+    --counts bitcoind.profdata | grep 'Counts: 0'` for hot-in-prod functions with no samples.
+- Read through `-fsave-optimization-record` remarks (opt-viewer / llvm-opt-report),
+    cross-referenced against `perf report` hot functions, for missed inlining/vectorization.
+- Try an instrumented BOLT profile (`llvm-bolt -instrument`) vs the perf-derived one and
+    compare `-dyno-stats` output.
+- Measure `--icf=safe` vs `--icf=all` size delta (`--print-icf-sections`)
+
+### Future
+
+- The leftover `__aarch64_cas4_acq`-style outline-atomics symbols (should) go-away when we switch to
+  a full LLVM libc build.
+
+
 ```
 ./build_llvm.sh
 ./build_depends.sh
@@ -12,11 +38,23 @@
 Currently tracking `release/23.x` (minimum for -static-pie in bolt).
 Update tracked branch with: `git submodule update --remote --depth 1`.
 
-## LLVM libc
+## LLVM Components
 
-Did we get some llvm libc
 ```bash
-llvm_toolchain/bin/llvm-nm -C build/bin/bitcoind | grep -i __llvm_libc | head
+LDFLAGS="-Wl,--why-extract=whyextract.txt" ./build_bitcoin.sh
+
+# Did we get libc++
+grep 'libc++' build/whyextract.txt
+
+# Did we get LLVM libc
+grep 'libllvmlibc.a' build/whyextract.txt
+llvm_toolchain/bin/llvm-nm -C build/bin/bitcoind | grep __llvm_libc
+
+# What came from libc.a
+grep '/libc\.a' build/whyextract.txt
+
+# Did we get scudo
+llvm_toolchain/bin/llvm-nm -C build/bin/bitcoind | grep malloc
 ```
 
 ## Uniform compilation flags
@@ -61,7 +99,7 @@ CFLAGS="${PGO_FLAGS}" CXXFLAGS="${PGO_FLAGS}" LDFLAGS="${PGO_FLAGS}" ./build_bit
 
 rm -rf /mnt/HC_Volume_104453609/btc_datadir/ && mkdir /mnt/HC_Volume_104453609/btc_datadir/
 
-time ./build/bin/bitcoind -datadir=/mnt/HC_Volume_104453609/btc_datadir -dbcache=6144 -prune=2000 -stopatheight=950000 -daemon
+time ./build/bin/bitcoind -datadir=/mnt/HC_Volume_104453609/btc_datadir -stopatheight=950000 -daemon
 
 llvm_toolchain/bin/llvm-profdata merge -o bitcoind.profdata raw_pgo/*.profraw
 ```
@@ -79,7 +117,7 @@ llvm_toolchain/bin/llvm-bolt ./build/bin/bitcoind \
                              --instrumentation-file=raw_bolt/prof.fdata \
                              -o bitcoind.instrumented
 
-time ./bitcoind.instrumented -datadir=/mnt/HC_Volume_104453609/btc_datadir -dbcache=6144 -prune=2000 -stopatheight=950000 -daemon
+time ./bitcoind.instrumented -datadir=/mnt/HC_Volume_104453609/btc_datadir -stopatheight=950000 -daemon
 
 # TODO: merge raw data from /tmp/prof.data into raw_bolt/
 ```
@@ -106,19 +144,3 @@ Opt report generation:
       --source-dir=/root/expert-potato/bitcoin \
       /root/expert-potato/build/bin/bitcoind-opt.ld.yaml
 ```
-
-## TODO
-
-- Add a "bloaty" analyse script
-- Check PGO training coverage: `llvm_toolchain/bin/llvm-profdata show --all-functions
-    --counts bitcoind.profdata | grep 'Counts: 0'` for hot-in-prod functions with no samples.
-- Read through `-fsave-optimization-record` remarks (opt-viewer / llvm-opt-report),
-    cross-referenced against `perf report` hot functions, for missed inlining/vectorization.
-- Try an instrumented BOLT profile (`llvm-bolt -instrument`) vs the perf-derived one and
-    compare `-dyno-stats` output.
-- Measure `--icf=safe` vs `--icf=all` size delta (`--print-icf-sections`)
-
-## Future
-
-- The leftover `__aarch64_cas4_acq`-style outline-atomics symbols (should) go-away when we switch to
-  a full LLVM libc build.
