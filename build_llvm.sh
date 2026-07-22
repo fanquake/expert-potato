@@ -17,10 +17,6 @@ list(APPEND TARGET_LLVMLIBC_REMOVED_ENTRYPOINTS
 )
 EOF
 
-LTO_FLAGS=(
-  -flto=full
-)
-
 RUNTIMES_FLAGS=(
   -mcpu=native
   -mbranch-protection=standard
@@ -43,6 +39,7 @@ cmake -S "$LLVM_SRC/llvm" -B "$BUILD" -G Ninja \
   -DCMAKE_RANLIB="$(command -v llvm-ranlib)" \
   -DLLVM_CCACHE_BUILD=ON \
   -DLLVM_ENABLE_LLD=ON \
+  -DLLVM_ENABLE_LTO=Thin \
   -DLLVM_ENABLE_PROJECTS='bolt;clang;lld' \
   -DLLVM_TARGETS_TO_BUILD=AArch64
 
@@ -59,11 +56,12 @@ cmake -S "$LLVM_SRC/runtimes" -B "$RUNTIMES_BUILD" -G Ninja \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_INSTALL_PREFIX="$PREFIX" \
   -DCMAKE_ASM_FLAGS="${RUNTIMES_FLAGS[*]}" \
-  -DCMAKE_C_FLAGS="${LTO_FLAGS[*]} ${RUNTIMES_FLAGS[*]}" \
-  -DCMAKE_CXX_FLAGS="${LTO_FLAGS[*]} ${RUNTIMES_FLAGS[*]} ${RUNTIMES_CXX_FLAGS[*]}" \
+  -DCMAKE_C_FLAGS="${RUNTIMES_FLAGS[*]}" \
+  -DCMAKE_CXX_FLAGS="${RUNTIMES_FLAGS[*]} ${RUNTIMES_CXX_FLAGS[*]}" \
   -DCMAKE_AR="$PREFIX/bin/llvm-ar" \
   -DCMAKE_RANLIB="$PREFIX/bin/llvm-ranlib" \
   -DCMAKE_LINKER_TYPE=LLD \
+  -DLLVM_ENABLE_LTO=Full \
   -DLLVM_ENABLE_PER_TARGET_RUNTIME_DIR=ON \
   -DLLVM_ENABLE_RUNTIMES='libc;libcxx;libcxxabi;libunwind;compiler-rt' \
   -DLIBCXX_ENABLE_SHARED=OFF \
