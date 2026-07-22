@@ -17,6 +17,12 @@ list(APPEND TARGET_LLVMLIBC_REMOVED_ENTRYPOINTS
 )
 EOF
 
+# Need -flto here too, for -fwhole-program-vtables, because
+# LLVM_ENABLE_LTO doesn't add the flag early enough.
+LTO_FLAGS=(
+  -flto=full
+)
+
 RUNTIMES_FLAGS=(
   -mcpu=native
   -mbranch-protection=standard
@@ -56,8 +62,8 @@ cmake -S "$LLVM_SRC/runtimes" -B "$RUNTIMES_BUILD" -G Ninja \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_INSTALL_PREFIX="$PREFIX" \
   -DCMAKE_ASM_FLAGS="${RUNTIMES_FLAGS[*]}" \
-  -DCMAKE_C_FLAGS="${RUNTIMES_FLAGS[*]}" \
-  -DCMAKE_CXX_FLAGS="${RUNTIMES_FLAGS[*]} ${RUNTIMES_CXX_FLAGS[*]}" \
+  -DCMAKE_C_FLAGS="${LTO_FLAGS[*]} ${RUNTIMES_FLAGS[*]}" \
+  -DCMAKE_CXX_FLAGS="${LTO_FLAGS[*]} ${RUNTIMES_FLAGS[*]} ${RUNTIMES_CXX_FLAGS[*]}" \
   -DCMAKE_AR="$PREFIX/bin/llvm-ar" \
   -DCMAKE_RANLIB="$PREFIX/bin/llvm-ranlib" \
   -DCMAKE_LINKER_TYPE=LLD \
