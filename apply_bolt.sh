@@ -7,16 +7,18 @@ DATA="${1:-$(pwd)/raw_bolt/prof.fdata}"
 
 BOLT_ARGS=(
   -dyno-stats
+  -lite=false
   -reorder-functions=cdsort
   -reorder-blocks=ext-tsp
   -split-functions
   -split-all-cold
   -split-eh
   --align-blocks
-  --peepholes=all
+  --hugify
   --icf=safe
   --inline-all
   --inline-memcpy
+  --peepholes=all
   --plt=hot
   --tail-duplication=aggressive
 )
