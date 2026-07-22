@@ -46,6 +46,9 @@ cmake -S "$LLVM_SRC/llvm" -B "$BUILD" -G Ninja \
   -DLLVM_CCACHE_BUILD=ON \
   -DLLVM_ENABLE_LLD=ON \
   -DLLVM_ENABLE_LTO=Thin \
+  -DLLVM_THINLTO_CACHE_PATH="$(pwd)/thinlto_cache" \
+  -DCMAKE_EXE_LINKER_FLAGS="-Wl,--thinlto-cache-policy=cache_size_bytes=20g" \
+  -DCMAKE_SHARED_LINKER_FLAGS="-Wl,--thinlto-cache-policy=cache_size_bytes=20g" \
   -DLLVM_ENABLE_PROJECTS='bolt;clang;lld' \
   -DLLVM_TARGETS_TO_BUILD=AArch64
 

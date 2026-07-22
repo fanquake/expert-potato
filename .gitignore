@@ -2,4 +2,5 @@ bitcoin/
 bitcoind.bolt
 build/
 llvm_toolchain/
+thinlto_cache/
 *.profdata
