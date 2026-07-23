@@ -1,6 +1,8 @@
 # Core x LLVM
 
-Working towards a self-contained build of Bitcoin Core with LLVM.
+Working towards a self-contained build of Bitcoin Core with LLVM. Experiments
+being done on a 16 CPU, Neoverse-N1 Arm64 box, running Fedora Rawhide.
+
 * Build using a self-compiled `23.x` Clang and `lld`.
 * Use LLVM [`libc++`](https://libcxx.llvm.org/)
 * Use LLVM [`libc` in overlay mode](https://libc.llvm.org/overlay_mode.html)
