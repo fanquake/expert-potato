@@ -14,11 +14,21 @@ being done on a 16 CPU, Neoverse-N1 Arm64 box, running Fedora Rawhide.
 git clone https://github.com/fanquake/core_x_llvm.git
 cd core_x_llvm
 git submodule update --init --depth 1
+git clone https://github.com/bitcoin/bitcoin
 
 ./build_llvm.sh
+
 ./build_depends.sh
-./build_bitcoin.sh
+
+export PGO_FLAGS="-fprofile-use=$(pwd)/bitcoind.profdata"
+CFLAGS="${PGO_FLAGS}" CXXFLAGS="${PGO_FLAGS}" LDFLAGS="-Wl,--emit-relocs ${PGO_FLAGS}" ./build_bitcoin.sh
+
 ./apply_bolt.sh
+
+file build/bin/bitcoind
+build/bin/bitcoind: ELF 64-bit LSB pie executable, ARM aarch64, version 1 (SYSV), static-pie linked, for GNU/Linux 3.7.0, with debug_info, not stripped
+
+./bitcoind.bolt -conf=$(pwd)/bench.conf
 ```
 
 ### TODO
