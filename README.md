@@ -8,35 +8,47 @@ Working towards a self-contained build of Bitcoin Core with LLVM.
 * Use [Profile Guided Optimization](https://clang.llvm.org/docs/UsersManual.html#profile-guided-optimization)
 * Use [LLVM BOLT](https://github.com/llvm/llvm-project/blob/main/bolt/README.md)
 
-### TODO
+```bash
+git clone https://github.com/fanquake/core_x_llvm.git
+cd core_x_llvm
+git submodule update --init --depth 1
 
-- Drop depends build if `boost::multi_index` is swapped for [`tmi2`](https://github.com/theuni/tmi2)
-- Add a [`bloaty`](https://github.com/google/bloaty) analyse script
-- Check PGO training coverage: `llvm_toolchain/bin/llvm-profdata show --all-functions
-    --counts bitcoind.profdata | grep 'Counts: 0'` for hot-in-prod functions with no samples.
-- Read through `-fsave-optimization-record` remarks (opt-viewer / llvm-opt-report),
-    cross-referenced against `perf report` hot functions, for missed inlining/vectorization.
-- Try an instrumented BOLT profile (`llvm-bolt -instrument`) vs the perf-derived one and
-    compare `-dyno-stats` output.
-- Measure `--icf=safe` vs `--icf=all` size delta (`--print-icf-sections`)
-
-### Future
-
-- The leftover `__aarch64_cas4_acq`-style outline-atomics symbols (should) go-away when we switch to
-  a full LLVM libc build.
-
-
-```
 ./build_llvm.sh
 ./build_depends.sh
 ./build_bitcoin.sh
 ./apply_bolt.sh
 ```
 
+### TODO
+
+- Add `-reindex`/`assumevalid=0` to `bench.conf`?
+- Drop depends build if `boost::multi_index` is swapped for [`tmi2`](https://github.com/theuni/tmi2)
+- Add a [`bloaty`](https://github.com/google/bloaty) analyse script
+- Check PGO training coverage: `llvm_toolchain/bin/llvm-profdata show --all-functions
+    --counts bitcoind.profdata | grep 'Counts: 0'` for hot-in-prod functions with no samples.
+- Read through `-fsave-optimization-record` remarks (opt-viewer / llvm-opt-report),
+    cross-referenced against `perf report` hot functions, for missed inlining/vectorization.
+  - Re-add `-Wl,--opt-remarks-with-hotness`
+- Try an instrumented BOLT profile (`llvm-bolt -instrument`) vs the perf-derived one and
+    compare `-dyno-stats` output.
+- Measure `--icf=safe` vs `--icf=all` size delta (`--print-icf-sections`)
+- Generate some examples of optimisation flag usage and optview2 output
+- Add a `samply` run: https://github.com/mstange/samply/
+
+### Future
+
+- The leftover `__aarch64_cas4_acq`-style outline-atomics symbols (should) go-away when we switch to
+  a full LLVM libc build.
+
 ## llvm-project submodule
 
-Currently tracking `release/23.x` (minimum for -static-pie in bolt).
-Update tracked branch with: `git submodule update --remote --depth 1`.
+Tracking `release/23.x` (minimum for -static-pie in bolt):
+```bash
+git -C llvm-project fetch --depth 1 origin release/23.x
+git -C llvm-project checkout FETCH_HEAD
+git add llvm-project
+git commit -m "llvm: update submodule to latest release/23.x"
+```
 
 ## LLVM Components
 
